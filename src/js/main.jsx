@@ -1,18 +1,48 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
+import React, { useState, useEffect, useRef } from 'react';
+import ReactDOM from 'react-dom/client';
+import SecondsCounter from './components/SecondsCounter';
+import '../styles/index.css';
 
-//Bootstrap
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap"
+const App = () => {
+  const [seconds, setSeconds] = useState(0);
+  const [isRunning, setIsRunning] = useState(true);
+  const intervalRef = useRef(null);
 
-// index.css'
-import '../styles/index.css'
+  useEffect(() => {
+    if (isRunning) {
+      intervalRef.current = setInterval(() => {
+        setSeconds(prevSeconds => prevSeconds + 1);
+      }, 1000);
+    }
+    return () => clearInterval(intervalRef.current);
+  }, [isRunning]);
 
-// components
-import Home from './components/Home';
+  const handleStop = () => {
+    setIsRunning(false);
+  };
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <Home/>
-  </React.StrictMode>,
-)
+  const handleResume = () => {
+    setIsRunning(true);
+  };
+
+  const handleReset = () => {
+    setSeconds(0);
+    setIsRunning(true);
+  };
+
+  return (
+    <div className="app-container">
+      <SecondsCounter seconds={seconds} />
+      <div className="controls">
+        <button onClick={handleStop}>Stop</button>
+        <button onClick={handleResume}>Resume</button>
+        <button onClick={handleReset}>Reset</button>
+      </div>
+    </div>
+  );
+};
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+
+
